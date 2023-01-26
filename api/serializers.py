@@ -42,8 +42,10 @@ class UserSerializer(serializers.ModelSerializer): #M
 
     def update(self, instance, validated_data):
         instance.username = validated_data.get('username', instance.username)
-        instance.password = validated_data.get('password', instance.password)
+        instance.password = make_password(validated_data.get('password', instance.password))
         instance.save()
+        # return instance
+        # мы хотим использовать метод create из класса ModelSerializer, но при этом мы добавили доп.функциональность - хэшировали пароль
+        # поэтому используем super().create(validated_data) для добавления нашей доп.функции
         return instance
-
 
