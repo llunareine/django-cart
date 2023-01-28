@@ -3,7 +3,14 @@ from django.contrib.auth.hashers import make_password #for hashing password
 import re
 
 from . import models
+
+class ItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Item
+        fields = ['id', 'item', 'price']
+
 class UserSerializer(serializers.ModelSerializer): #M
+
 
     def validate_username(self, value):  #можно делать кастомную валидацию обьявляя функцию валидейт_название поля (селф валую)
         if len(value) < 5:
@@ -21,6 +28,7 @@ class UserSerializer(serializers.ModelSerializer): #M
     class Meta:
         model = models.User
         fields = ['id', 'username', 'password']
+
 
         # from rest_framework import serializers
         # class CommentSerializer(serializers.Serializer):
@@ -49,3 +57,9 @@ class UserSerializer(serializers.ModelSerializer): #M
         # поэтому используем super().create(validated_data) для добавления нашей доп.функции
         return instance
 
+class UserItemSerializer(serializers.ModelSerializer):
+    items = ItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.User
+        fields = ['items']
