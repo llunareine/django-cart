@@ -65,9 +65,25 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
         obj = get_object_or_404(User, id=user_id)
         return obj
 
-class Items(generics.ListCreateAPIView):
+class UserItem(generics.ListCreateAPIView):
     serializer_class = serializers.UserItemSerializer
     def get_queryset(self):
         user_id = self.kwargs['user_id']
         return User.objects.filter(id=user_id)
 
+    # def create(self, request, *args, **kwargs):
+    #     user_id = self.kwargs['user_id']
+    #     user = User.objects.get(id=user_id)
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     user.items.add(serializer.instance)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    #
+    # def create(self, validated_data):
+    #     items_data = validated_data.pop('items')
+    #     user = User.objects.create(**validated_data)
+    #     for items_data in items_data:
+    #         Item.objects.create(user=user, **items_data)
+    #     return user

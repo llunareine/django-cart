@@ -58,8 +58,30 @@ class UserSerializer(serializers.ModelSerializer): #M
         return instance
 
 class UserItemSerializer(serializers.ModelSerializer):
-    items = ItemSerializer(many=True, read_only=True)
+    items = ItemSerializer(many=True)
 
     class Meta:
         model = models.User
         fields = ['items']
+
+    def create(self, validated_data):
+        user_id = self.context['view'].kwargs['user_id']
+        user = models.User.objects.get(id=user_id)
+        items_data = validated_data.pop('items')
+        items = []
+        for item_data in items_data:
+            item, created = models.Item.objects.get_or_create(item=item_data['item'], defaults={'price': item_data['price']})
+            items.append(item)
+        user.items.add(*items)
+        return user
+
+    def update(self, instance, validated_data):
+        user_id = self.context['view'].kwargs['user_id']
+        user = models.User.objects.get(id=user_id)
+        items_data = validated_data.pop('items')
+        items = []
+        for item_data in items_data:
+            item, created = models.Item.objects.get_or_update(item=item_data['item'], defaults={'price': item_data['price']})
+            items.append(item)
+        user.items.add(*items)
+        return user
